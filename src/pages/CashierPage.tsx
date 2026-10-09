@@ -15,6 +15,7 @@ import {
   SegmentedToggle,
   Spinner,
   StockBadge,
+  Switch,
   WarnBox,
 } from '../components/ui'
 import { useMyProfile } from '../lib/auth'
@@ -61,6 +62,7 @@ function Cashier({ storeId }: { storeId: string }) {
   const [limit, setLimit] = useState(PAGE)
   const [flash, setFlash] = useState<{ kind: 'ok' | 'error'; text: string } | null>(null)
   const [serviceOpen, setServiceOpen] = useState(false)
+  const [saleDiscOn, setSaleDiscOn] = useState(() => cart.discValue > 0)
   const [saved, setSaved] = useState<SaleWithDetails | null>(null)
   const [printKey, setPrintKey] = useState(0)
   const searchRef = useRef<HTMLInputElement>(null)
@@ -154,6 +156,7 @@ function Cashier({ storeId }: { storeId: string }) {
     },
     onSuccess: (sale) => {
       setCart(emptyCart())
+      setSaleDiscOn(false)
       setSaved(sale)
       setPrintKey((k) => k + 1)
       qc.invalidateQueries({ queryKey: ['products'] })
@@ -279,7 +282,9 @@ function Cashier({ storeId }: { storeId: string }) {
               <Button
                 variant="ghost"
                 onClick={() => {
-                  if (confirm('Kosongkan keranjang?')) setCart(emptyCart())
+                  if (!confirm('Kosongkan keranjang?')) return
+                  setCart(emptyCart())
+                  setSaleDiscOn(false)
                 }}
               >
                 <X size={18} />
@@ -335,20 +340,29 @@ function Cashier({ storeId }: { storeId: string }) {
         <div className="space-y-1 border-t border-slate-100 pt-3 text-sm">
           <Row label="Subtotal" value={rupiah(totals.subtotal)} />
           {totals.lineDiscount > 0 && <Row label="Diskon baris" value={`−${rupiah(totals.lineDiscount)}`} />}
-          <div className="flex items-center justify-between gap-2">
-            <span>Diskon Penjualan</span>
-            <div className="flex items-center gap-1">
-              <SegmentedToggle
-                value={cart.discMode}
-                options={discModes}
-                onChange={(m) => update((c) => ({ ...c, discMode: m, discValue: 0 }))}
-              />
-              <NumberInput
-                className="w-28 text-right"
-                value={cart.discValue}
-                onChange={(n) => update((c) => ({ ...c, discValue: n }))}
-              />
-            </div>
+          <div className="flex flex-wrap items-center justify-between gap-2">
+            <Switch
+              label="Diskon Penjualan"
+              checked={saleDiscOn}
+              onChange={(on) => {
+                setSaleDiscOn(on)
+                if (!on) update((c) => ({ ...c, discMode: 'amount', discValue: 0 }))
+              }}
+            />
+            {saleDiscOn && (
+              <div className="flex items-center gap-1">
+                <SegmentedToggle
+                  value={cart.discMode}
+                  options={discModes}
+                  onChange={(m) => update((c) => ({ ...c, discMode: m, discValue: 0 }))}
+                />
+                <NumberInput
+                  className="w-28 text-right"
+                  value={cart.discValue}
+                  onChange={(n) => update((c) => ({ ...c, discValue: n }))}
+                />
+              </div>
+            )}
           </div>
           {totals.saleDiscount > 0 && <Row label="" value={`−${rupiah(totals.saleDiscount)}`} />}
           <div className="flex items-center justify-between pt-2 text-2xl font-bold">
@@ -483,6 +497,7 @@ function CartRow({
   const name = line.kind === 'part' ? (product?.name ?? 'Sparepart tidak ditemukan') : line.name
   const price = line.kind === 'part' ? (product?.sell_price ?? 0) : line.price
   const afterSale = product ? product.stock - totalQtyOfProduct : 0
+  const [discOn, setDiscOn] = useState(line.discValue > 0)
   return (
     <li className="space-y-2 border-b border-slate-100 p-3 last:border-0">
       <div className="flex items-start justify-between gap-2">
@@ -518,15 +533,29 @@ function CartRow({
             <Plus size={16} />
           </Button>
         </div>
-        <div className="flex items-center gap-1">
-          <span className="text-sm text-slate-500">Diskon</span>
-          <SegmentedToggle value={line.discMode} options={discModes} onChange={(m) => onChange({ discMode: m, discValue: 0 })} />
-          <NumberInput className="w-24 text-right" value={line.discValue} onChange={(n) => onChange({ discValue: n })} />
-        </div>
+        <Switch
+          label="Diskon"
+          checked={discOn}
+          onChange={(on) => {
+            setDiscOn(on)
+            if (!on) onChange({ discMode: 'amount', discValue: 0 })
+          }}
+        />
         <Button variant="ghost" className="ml-auto text-red-600" onClick={onRemove} title="Hapus">
           <Trash2 size={18} />
         </Button>
       </div>
+      {discOn && (
+        <div className="flex items-center justify-end gap-1">
+          <SegmentedToggle value={line.discMode} options={discModes} onChange={(m) => onChange({ discMode: m, discValue: 0 })} />
+          <NumberInput
+            autoFocus
+            className="w-28 text-right"
+            value={line.discValue}
+            onChange={(n) => onChange({ discValue: n })}
+          />
+        </div>
+      )}
       {line.kind === 'part' && product && afterSale < 0 && (
         <WarnBox>
           Stok sistem {num(product.stock)} {product.unit} — setelah Penjualan ini Stok jadi {num(afterSale)}. Tetap bisa

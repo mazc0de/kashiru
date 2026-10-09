@@ -162,6 +162,36 @@ export function StockBadge({ status }: { status: StockStatus }) {
   )
 }
 
+/** Saklar on/off dengan label, untuk fitur opsional (mis. Diskon). */
+export function Switch({
+  checked,
+  onChange,
+  label,
+}: {
+  checked: boolean
+  onChange: (checked: boolean) => void
+  label: string
+}) {
+  return (
+    <button
+      type="button"
+      role="switch"
+      aria-checked={checked}
+      onClick={() => onChange(!checked)}
+      className="inline-flex min-h-10 items-center gap-2 text-sm text-slate-600"
+    >
+      <span
+        className={`relative inline-flex h-6 w-10 shrink-0 rounded-full transition-colors ${checked ? 'bg-teal-700' : 'bg-slate-300'}`}
+      >
+        <span
+          className={`absolute top-0.5 left-0.5 size-5 rounded-full bg-white shadow transition-transform ${checked ? 'translate-x-4' : ''}`}
+        />
+      </span>
+      {label}
+    </button>
+  )
+}
+
 export function SegmentedToggle<T extends string>({
   value,
   options,
