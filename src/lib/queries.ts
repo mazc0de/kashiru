@@ -108,10 +108,23 @@ export function useCatalog() {
     const byId = new Map(entries.map((e) => [e.id, e]))
     const byBarcode = new Map<string, CatalogEntry>()
     for (const e of entries) for (const b of e.barcodes) byBarcode.set(b, e)
-    return { entries, byId, byBarcode }
+    // Label Honda (PDF417) berisi Nomor Part, mis. "43130-KZL-930". Hanya dipakai bila Nomor Part unik.
+    const byPartNumber = new Map<string, CatalogEntry | null>()
+    for (const e of entries) {
+      const k = partKey(e.part_number)
+      if (k) byPartNumber.set(k, byPartNumber.has(k) ? null : e)
+    }
+    /** Cari Sparepart dari hasil scan: Barcode terdaftar dulu, lalu Nomor Part. */
+    const findByCode = (code: string) => byBarcode.get(code) ?? byPartNumber.get(partKey(code)) ?? undefined
+    return { entries, byId, byBarcode, findByCode }
   }, [products.data, categories.data, brands.data])
 
   return { ...value, isLoading: products.isLoading, error: products.error }
+}
+
+/** Nomor Part dinormalkan: huruf besar, tanpa spasi/tanda hubung. */
+function partKey(s: string) {
+  return s.toUpperCase().replace(/[^0-9A-Z]/g, '')
 }
 
 /** Cari lewat nama, Nomor Part, Tipe Kendaraan, Merek, Kategori, dan Barcode sekaligus. */

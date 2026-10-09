@@ -108,7 +108,7 @@ function Cashier({ storeId }: { storeId: string }) {
   }
 
   function onSubmitSearch(value: string, source: 'keyboard' | 'camera') {
-    const byBarcode = catalog.byBarcode.get(value)
+    const byBarcode = catalog.findByCode(value)
     if (byBarcode) {
       addProduct(byBarcode)
       setQuery('')

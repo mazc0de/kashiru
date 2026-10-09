@@ -17,9 +17,6 @@ dependencies:
   '@tanstack/react-query-persist-client':
     specifier: ^5.104.1
     version: 5.104.1(@tanstack/react-query@5.104.1)(react@19.3.0)
-  '@zxing/browser':
-    specifier: ^0.2.1
-    version: 0.2.1(@zxing/library@0.23.0)
   '@zxing/library':
     specifier: ^0.23.0
     version: 0.23.0
@@ -2227,16 +2224,6 @@ packages:
       '@rolldown/pluginutils': 1.0.1
       vite: 8.3.4(@types/node@24.19.1)
     dev: true
-
-  /@zxing/browser@0.2.1(@zxing/library@0.23.0):
-    resolution: {integrity: sha512-92pVfVDUXbc15xu9vIEmhNyqIEASMEkDF92CwT6T+7sg2EHXJRktH9CQKoQSXe51UtbNsj+Fm09H/JBWHMs/Sw==}
-    peerDependencies:
-      '@zxing/library': ^0.23.0
-    dependencies:
-      '@zxing/library': 0.23.0
-    optionalDependencies:
-      '@zxing/text-encoding': 0.9.0
-    dev: false
 
   /@zxing/library@0.23.0:
     resolution: {integrity: sha512-6fkkoFwP8CHxl6ugnPsj74PLJgX2iRv5zczGAyt5OBzQgxFhuhF0NCEc4t4OvSr8xAv2MRLlI0Iu9ZGDZQ2urA==}

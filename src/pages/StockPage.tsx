@@ -42,7 +42,7 @@ export function StockPage() {
 
   function onSubmit(value: string, source: 'keyboard' | 'camera') {
     setUnknownBarcode('')
-    const hit = catalog.byBarcode.get(value)
+    const hit = catalog.findByCode(value)
     if (hit) return navigate(`/stok/${hit.id}`)
     if (source === 'camera' || looksLikeBarcode(value)) {
       setUnknownBarcode(value)

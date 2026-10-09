@@ -56,7 +56,7 @@ export function ReceivingPage() {
   }, [preset, catalog.isLoading])
 
   function onSubmit(value: string, source: 'keyboard' | 'camera') {
-    const hit = catalog.byBarcode.get(value)
+    const hit = catalog.findByCode(value)
     if (hit) return add(hit)
     if (source === 'camera' || (looksLikeBarcode(value) && results.length === 0)) {
       setUnknownBarcode(value)
