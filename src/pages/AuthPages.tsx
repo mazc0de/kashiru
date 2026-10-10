@@ -9,15 +9,23 @@ import { supabase } from '../lib/supabase'
 
 function AuthCard({ title, children }: { title: string; children: ReactNode }) {
   return (
-    <div className="min-h-dvh">
+    <div className="min-h-dvh bg-[radial-gradient(ellipse_at_top,rgb(15_118_110/0.08),transparent_60%)]">
       <OfflineBanner />
-      <div className="mx-auto max-w-sm px-4 py-12">
-        <div className="mb-6 text-center">
-          <div className="text-3xl font-bold text-teal-700">Kashiru</div>
-          <p className="text-sm text-slate-500">POS bengkel</p>
+      <div className="mx-auto max-w-sm px-4 pt-14 pb-12 sm:pt-20">
+        <div className="mb-8 flex items-center gap-3">
+          <span
+            aria-hidden
+            className="grid size-11 place-items-center rounded-xl bg-teal-700 text-xl font-bold text-white shadow-[inset_0_1px_0_rgb(255_255_255/0.15)]"
+          >
+            K
+          </span>
+          <div>
+            <div className="text-xl leading-tight font-semibold tracking-tight text-slate-900">Kashiru</div>
+            <p className="text-sm leading-tight text-slate-500">POS bengkel</p>
+          </div>
         </div>
-        <div className="rounded-2xl border border-slate-200 bg-white p-5">
-          <h1 className="mb-4 text-lg font-semibold">{title}</h1>
+        <div className="rounded-xl border border-slate-200/80 bg-white p-6 shadow-raised">
+          <h1 className="mb-5 text-xl font-semibold tracking-tight">{title}</h1>
           {children}
         </div>
       </div>
@@ -46,7 +54,7 @@ export function LoginPage() {
 
   return (
     <AuthCard title="Masuk">
-      <form onSubmit={submit} className="space-y-3">
+      <form onSubmit={submit} className="space-y-4">
         <Field label="Email">
           <Input type="email" autoComplete="email" required value={email} onChange={(e) => setEmail(e.target.value)} />
         </Field>
@@ -64,9 +72,9 @@ export function LoginPage() {
           {busy ? 'Masuk…' : 'Masuk'}
         </Button>
       </form>
-      <p className="mt-4 text-center text-sm text-slate-600">
+      <p className="mt-5 text-center text-sm text-slate-600">
         Belum punya Toko?{' '}
-        <Link to="/daftar" className="font-medium text-teal-700 hover:underline">
+        <Link to="/daftar" className="font-medium text-teal-700 underline-offset-2 hover:underline">
           Daftar Toko baru
         </Link>
       </p>
@@ -104,10 +112,10 @@ export function SignupPage() {
   if (sent) {
     return (
       <AuthCard title="Cek email Anda">
-        <p className="text-slate-600">
+        <p className="leading-relaxed text-slate-600">
           Kami mengirim tautan konfirmasi ke <b>{email}</b>. Buka tautan itu, lalu masuk untuk melanjutkan membuat Toko.
         </p>
-        <Link to="/login" className="mt-4 block text-center font-medium text-teal-700 hover:underline">
+        <Link to="/login" className="mt-5 block text-center font-medium text-teal-700 underline-offset-2 hover:underline">
           Ke halaman masuk
         </Link>
       </AuthCard>
@@ -116,7 +124,7 @@ export function SignupPage() {
 
   return (
     <AuthCard title="Daftar Toko baru">
-      <form onSubmit={submit} className="space-y-3">
+      <form onSubmit={submit} className="space-y-4">
         <Field label="Email">
           <Input type="email" autoComplete="email" required value={email} onChange={(e) => setEmail(e.target.value)} />
         </Field>
@@ -134,14 +142,14 @@ export function SignupPage() {
           {busy ? 'Mendaftar…' : 'Lanjut'}
         </Button>
       </form>
-      <p className="mt-4 text-center text-sm text-slate-600">
+      <p className="mt-5 text-center text-sm text-slate-600">
         Sudah punya akun?{' '}
-        <Link to="/login" className="font-medium text-teal-700 hover:underline">
+        <Link to="/login" className="font-medium text-teal-700 underline-offset-2 hover:underline">
           Masuk
         </Link>
       </p>
       <p className="mt-2 text-center text-xs text-slate-500">
-        Karyawan bengkel tidak mendaftar di sini — akunnya dibuat dari menu Pengaturan → Pengguna.
+        Karyawan bengkel tidak mendaftar di sini. Akunnya dibuat dari menu Pengaturan → Pengguna.
       </p>
     </AuthCard>
   )
@@ -182,11 +190,11 @@ export function CreateStorePage() {
 
   return (
     <AuthCard title="Buat Toko">
-      <form onSubmit={submit} className="space-y-3">
+      <form onSubmit={submit} className="space-y-4">
         <Field label="Nama Toko">
           <Input required value={name} placeholder="Bengkel Maju Jaya" onChange={(e) => setName(e.target.value)} />
         </Field>
-        <Field label="Kode Toko" hint="2–4 huruf, dipakai di awal Nomor Nota (mis. BMJ-261009-0001). Bisa diubah nanti di Pengaturan.">
+        <Field label="Kode Toko" hint="2-4 huruf, dipakai di awal Nomor Nota (mis. BMJ-261009-0001). Bisa diubah nanti di Pengaturan.">
           <Input
             required
             value={code}

@@ -1,9 +1,9 @@
 import { useMemo, useState } from 'react'
 import { Link, useNavigate } from 'react-router'
-import { PackagePlus, Plus } from 'lucide-react'
+import { ChevronRight, PackagePlus, PackageSearch, Plus } from 'lucide-react'
 import { ScanSearchInput } from '../components/ScanSearchInput'
 import { Select } from '../components/Select'
-import { Button, Card, PageHeader, Spinner, StockBadge } from '../components/ui'
+import { Button, Card, PageHeader, Spinner, StockBadge, focusRing } from '../components/ui'
 import { num, rupiah, stockStatus, type StockStatus } from '../lib/format'
 import { looksLikeBarcode, searchCatalog, useBrands, useCatalog, useCategories } from '../lib/queries'
 
@@ -79,7 +79,7 @@ export function StockPage() {
           onSubmit={onSubmit}
         />
         {unknownBarcode && (
-          <div className="flex flex-wrap items-center justify-between gap-2 rounded-lg border border-amber-200 bg-amber-50 px-3 py-2 text-sm text-amber-900">
+          <div className="animate-flash flex flex-wrap items-center justify-between gap-2 rounded-lg border border-amber-200 bg-amber-50 px-3 py-2 text-sm text-amber-900">
             <span>
               Barcode <b>{unknownBarcode}</b> belum terdaftar.
             </span>
@@ -104,7 +104,8 @@ export function StockPage() {
               key={v}
               type="button"
               onClick={() => setStatus(v)}
-              className={`min-h-10 rounded-full border px-3 text-sm ${status === v ? 'border-teal-700 bg-teal-700 text-white' : 'border-slate-300 bg-white text-slate-700'}`}
+              aria-pressed={status === v}
+              className={`min-h-10 rounded-lg px-3 text-sm font-medium transition-[background-color,color,box-shadow] duration-150 active:scale-[0.98] ${focusRing} ${status === v ? 'bg-teal-700 text-white shadow-[inset_0_1px_0_rgb(255_255_255/0.12)]' : 'bg-white text-slate-700 ring-1 ring-inset ring-slate-300 hover:ring-slate-400'}`}
             >
               {label}
             </button>
@@ -123,38 +124,45 @@ export function StockPage() {
             placeholder="Merek"
             options={(brands.data ?? []).map((b) => ({ value: b.id, label: b.name }))}
           />
-          <label className="flex items-center gap-2 text-sm text-slate-600">
-            <input type="checkbox" checked={showInactive} onChange={(e) => setShowInactive(e.target.checked)} />
+          <label className="flex min-h-10 items-center gap-2 px-1 text-sm text-slate-600">
+            <input type="checkbox" className="size-4 accent-teal-700" checked={showInactive} onChange={(e) => setShowInactive(e.target.checked)} />
             Tampilkan nonaktif
           </label>
         </div>
 
         <Card>
           {rows.length === 0 ? (
-            <p className="p-6 text-center text-sm text-slate-500">
+            <div className="flex flex-col items-center gap-2 px-6 py-12 text-center text-sm text-slate-500">
+              <PackageSearch size={28} className="text-slate-400" aria-hidden />
               {catalog.entries.length === 0 ? 'Belum ada Sparepart. Tambahkan lewat tombol + Sparepart.' : 'Tidak ada yang cocok.'}
-            </p>
+            </div>
           ) : (
             <ul>
               {rows.slice(0, limit).map((p) => (
                 <li key={p.id} className="border-b border-slate-100 last:border-0">
-                  <Link to={`/stok/${p.id}`} className="flex items-center justify-between gap-3 px-3 py-2.5 hover:bg-slate-50">
+                  <Link
+                    to={`/stok/${p.id}`}
+                    className={`group flex items-center justify-between gap-3 px-4 py-3 transition-colors hover:bg-slate-50 focus-visible:bg-slate-50 ${focusRing} focus-visible:ring-inset focus-visible:ring-offset-0`}
+                  >
                     <div className="min-w-0">
-                      <div className="truncate font-medium">
+                      <div className="truncate font-medium text-slate-900">
                         {p.name}
-                        {!p.is_active && <span className="ml-2 text-xs text-slate-400">(nonaktif)</span>}
+                        {!p.is_active && <span className="ml-2 text-xs font-normal text-slate-500">(nonaktif)</span>}
                       </div>
                       <div className="truncate text-xs text-slate-500">
                         {[p.part_number, p.brandName, p.categoryName, p.vehicle_types.join(', ')].filter(Boolean).join(' · ')}
                       </div>
                     </div>
-                    <div className="shrink-0 text-right">
-                      <div className="font-semibold">
-                        {num(p.stock)} <span className="text-xs font-normal text-slate-500">{p.unit}</span>
+                    <div className="flex shrink-0 items-center gap-2">
+                      <div className="text-right">
+                        <div className="font-semibold">
+                          {num(p.stock)} <span className="text-xs font-normal text-slate-500">{p.unit}</span>
+                        </div>
+                        <div className="flex items-center justify-end gap-2 text-xs text-slate-500">
+                          {rupiah(p.sell_price)} <StockBadge status={stockStatus(p)} />
+                        </div>
                       </div>
-                      <div className="flex items-center justify-end gap-2 text-xs text-slate-500">
-                        {rupiah(p.sell_price)} <StockBadge status={stockStatus(p)} />
-                      </div>
+                      <ChevronRight size={18} className="text-slate-300 transition-transform group-hover:translate-x-0.5 group-hover:text-slate-400" aria-hidden />
                     </div>
                   </Link>
                 </li>

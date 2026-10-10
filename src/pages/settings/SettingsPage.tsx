@@ -1,8 +1,8 @@
 import { useQueryClient } from '@tanstack/react-query'
 import { useState, type FormEvent } from 'react'
 import { Link } from 'react-router'
-import { LogOut, Tags, Users, Wrench, type LucideIcon } from 'lucide-react'
-import { Button, Card, ErrorBox, Field, Input, PageHeader, SegmentedToggle, Spinner, Textarea } from '../../components/ui'
+import { ChevronRight, LogOut, Tags, Users, Wrench, type LucideIcon } from 'lucide-react'
+import { Button, Card, ErrorBox, Field, Input, PageHeader, SegmentedToggle, Spinner, Textarea, focusRing } from '../../components/ui'
 import { useMyProfile, useSignOut } from '../../lib/auth'
 import { errorText } from '../../lib/errors'
 import { useOnline } from '../../lib/online'
@@ -34,10 +34,18 @@ export function SettingsPage() {
 
 function NavCard({ to, icon: Icon, title, desc }: { to: string; icon: LucideIcon; title: string; desc: string }) {
   return (
-    <Link to={to} className="rounded-xl border border-slate-200 bg-white p-3 hover:border-teal-600">
-      <Icon size={20} className="mb-1 text-teal-700" />
-      <div className="font-medium">{title}</div>
-      <div className="text-xs text-slate-500">{desc}</div>
+    <Link
+      to={to}
+      className={`group flex items-start gap-3 rounded-xl border border-slate-200/80 bg-white p-4 shadow-panel transition-[border-color,box-shadow,transform] duration-150 hover:border-slate-300 hover:shadow-raised active:scale-[0.99] ${focusRing}`}
+    >
+      <span className="grid size-9 shrink-0 place-items-center rounded-lg bg-teal-700/10 text-teal-800">
+        <Icon size={18} aria-hidden />
+      </span>
+      <span className="min-w-0 flex-1">
+        <span className="block font-medium text-slate-900">{title}</span>
+        <span className="block text-xs leading-relaxed text-slate-500">{desc}</span>
+      </span>
+      <ChevronRight size={16} className="mt-1 shrink-0 text-slate-300 transition-transform group-hover:translate-x-0.5" aria-hidden />
     </Link>
   )
 }
@@ -57,7 +65,7 @@ function StoreForm({ store }: { store: Store }) {
 
   async function submit(e: FormEvent) {
     e.preventDefault()
-    if (code.length < 2) return setError('Kode Toko harus 2–4 huruf.')
+    if (code.length < 2) return setError('Kode Toko harus 2-4 huruf.')
     setBusy(true)
     setError('')
     setMsg('')
@@ -79,9 +87,9 @@ function StoreForm({ store }: { store: Store }) {
   }
 
   return (
-    <Card className="p-4">
-      <form onSubmit={submit} className="space-y-3">
-        <h2 className="font-semibold">Toko & Nota</h2>
+    <Card className="p-5">
+      <form onSubmit={submit} className="space-y-4">
+        <h2 className="text-lg font-semibold tracking-tight">Toko & Nota</h2>
         <Field label="Nama Toko">
           <Input required value={name} onChange={(e) => setName(e.target.value)} />
         </Field>
@@ -93,7 +101,7 @@ function StoreForm({ store }: { store: Store }) {
         </Field>
         <Field
           label="Kode Toko"
-          hint="2–4 huruf, awalan Nomor Nota. Perubahan hanya berlaku untuk Nota baru; Nota lama tetap memakai kode lama."
+          hint="2-4 huruf, awalan Nomor Nota. Perubahan hanya berlaku untuk Nota baru; Nota lama tetap memakai kode lama."
         >
           <Input
             required
@@ -103,7 +111,7 @@ function StoreForm({ store }: { store: Store }) {
           />
         </Field>
         <div>
-          <span className="mb-1 block text-sm font-medium text-slate-700">Ukuran kertas Nota</span>
+          <span className="mb-1.5 block text-sm font-medium text-slate-700">Ukuran kertas Nota</span>
           <SegmentedToggle<string>
             value={String(paper)}
             options={[
@@ -145,9 +153,9 @@ function MyNameForm() {
   }
 
   return (
-    <Card className="p-4">
-      <form onSubmit={submit} className="space-y-3">
-        <h2 className="font-semibold">Akun saya</h2>
+    <Card className="p-5">
+      <form onSubmit={submit} className="space-y-4">
+        <h2 className="text-lg font-semibold tracking-tight">Akun saya</h2>
         <p className="text-sm text-slate-500">{profile.data?.email}</p>
         <Field label="Nama (tampil sebagai kasir di Nota)">
           <Input required value={name} onChange={(e) => setName(e.target.value)} />

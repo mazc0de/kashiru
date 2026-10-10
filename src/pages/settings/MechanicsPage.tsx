@@ -32,10 +32,10 @@ export function MechanicsPage() {
   return (
     <div className="mx-auto max-w-xl space-y-3">
       <PageHeader title="Mekanik" />
-      <p className="text-sm text-slate-500">
+      <p className="max-w-[65ch] text-sm leading-relaxed text-slate-500">
         Mekanik tidak login; namanya dipilih di kasir dan tercetak di Nota. Mekanik yang keluar dinonaktifkan.
       </p>
-      <Card className="p-3">
+      <Card className="p-4">
         <form onSubmit={add} className="mb-2 flex gap-2">
           <Input value={name} placeholder="Nama Mekanik" onChange={(e) => setName(e.target.value)} />
           <Button type="submit" disabled={!name.trim()}>
@@ -50,7 +50,7 @@ export function MechanicsPage() {
           <ul>
             {(mechanics.data ?? []).map((m) => (
               <li key={m.id} className="flex items-center justify-between border-b border-slate-100 py-2 last:border-0">
-                <span className={m.is_active ? '' : 'text-slate-400'}>
+                <span className={m.is_active ? 'font-medium text-slate-900' : 'text-slate-500'}>
                   {m.name} {!m.is_active && '(nonaktif)'}
                 </span>
                 <Button variant="secondary" onClick={() => toggle(m.id, !m.is_active)}>

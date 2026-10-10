@@ -72,9 +72,9 @@ function NamedList({
   }
 
   return (
-    <Card className="p-3">
-      <h2 className="mb-2 font-semibold">{title}</h2>
-      <form onSubmit={add} className="mb-2 flex gap-2">
+    <Card className="p-4">
+      <h2 className="mb-3 text-lg font-semibold tracking-tight">{title}</h2>
+      <form onSubmit={add} className="mb-3 flex gap-2">
         <Input value={name} placeholder={`${title} baru`} onChange={(e) => setName(e.target.value)} />
         <Button type="submit" disabled={!name.trim()}>
           <Plus size={18} />
@@ -103,7 +103,7 @@ function NamedList({
               ) : (
                 <>
                   <span className="flex-1">
-                    {it.name} <span className="text-xs text-slate-400">({usage(it.id)})</span>
+                    {it.name} <span className="ml-1 rounded-md bg-slate-100 px-1.5 py-0.5 text-xs text-slate-500">{usage(it.id)}</span>
                   </span>
                   <Button variant="ghost" onClick={() => setEditing({ id: it.id, name: it.name })} title="Ubah">
                     <Pencil size={18} />

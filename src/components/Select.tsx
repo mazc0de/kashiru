@@ -7,16 +7,16 @@ type Option = { value: string; label: string }
 /** Gaya Tailwind bersama untuk semua dropdown (react-select, mode unstyled). */
 const selectClassNames: ClassNamesConfig<Option, false, GroupBase<Option>> = {
   control: ({ isFocused, isDisabled }) =>
-    `min-h-11 rounded-lg border bg-white px-3 ${isDisabled ? 'bg-slate-100' : ''} ${isFocused ? 'border-teal-600 ring-2 ring-teal-600/20' : 'border-slate-300'}`,
-  placeholder: () => 'text-slate-400',
+    `min-h-11 rounded-lg border bg-white px-3 shadow-panel transition-[border-color,box-shadow] duration-150 ${isDisabled ? 'bg-slate-100' : ''} ${isFocused ? 'border-teal-600 ring-4 ring-teal-600/15' : 'border-slate-300 hover:border-slate-400'}`,
+  placeholder: () => 'text-slate-500',
   valueContainer: () => 'gap-1',
   indicatorsContainer: () => 'gap-1 text-slate-400',
   clearIndicator: () => 'p-1 hover:text-slate-600',
   dropdownIndicator: () => 'p-1 hover:text-slate-600',
-  menu: () => 'mt-1 overflow-hidden rounded-lg border border-slate-200 bg-white shadow-lg',
+  menu: () => 'animate-flash mt-1.5 overflow-hidden rounded-xl border border-slate-200 bg-white p-1 shadow-raised',
   menuList: () => 'max-h-64',
   option: ({ isFocused, isSelected }) =>
-    `px-3 py-2 ${isSelected ? 'font-semibold text-teal-700' : ''} ${isFocused ? 'bg-slate-50' : ''}`,
+    `rounded-lg px-3 py-2 ${isSelected ? 'font-semibold text-teal-800' : ''} ${isFocused ? 'bg-slate-100' : ''}`,
   noOptionsMessage: () => 'px-3 py-2 text-sm text-slate-500',
 }
 

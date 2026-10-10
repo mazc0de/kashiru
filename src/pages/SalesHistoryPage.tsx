@@ -1,7 +1,8 @@
 import { keepPreviousData, useQuery } from '@tanstack/react-query'
 import { useState } from 'react'
 import { Link } from 'react-router'
-import { Card, Input, PageHeader, Spinner } from '../components/ui'
+import { ChevronRight, ReceiptText } from 'lucide-react'
+import { Card, Input, PageHeader, Spinner, focusRing } from '../components/ui'
 import { dateTime, longDate, num, paymentLabel, rupiah, todayIn } from '../lib/format'
 import { useStore } from '../lib/queries'
 import { supabase } from '../lib/supabase'
@@ -70,19 +71,27 @@ export function SalesHistoryPage() {
         {q.isLoading ? (
           <Spinner />
         ) : q.error ? (
-          <p className="p-4 text-sm text-red-700">Gagal memuat Riwayat Penjualan.</p>
+          <p role="alert" className="p-4 text-sm text-red-700">Gagal memuat Riwayat Penjualan.</p>
         ) : rows.length === 0 ? (
-          <p className="p-6 text-center text-sm text-slate-500">Tidak ada Penjualan.</p>
+          <div className="flex flex-col items-center gap-2 px-6 py-12 text-center text-sm text-slate-500">
+            <ReceiptText size={28} className="text-slate-400" aria-hidden />
+            Tidak ada Penjualan.
+          </div>
         ) : (
           <ul>
             {rows.map((s) => (
               <li key={s.id} className="border-b border-slate-100 last:border-0">
-                <Link to={`/riwayat/${s.id}`} className="flex items-center justify-between gap-3 px-3 py-2.5 hover:bg-slate-50">
+                <Link
+                  to={`/riwayat/${s.id}`}
+                  className={`group flex items-center justify-between gap-3 px-4 py-3 transition-colors hover:bg-slate-50 ${focusRing} focus-visible:ring-inset focus-visible:ring-offset-0`}
+                >
                   <div className="min-w-0">
                     <div className="font-mono text-sm font-medium">
                       {s.receipt_no}
                       {s.status === 'void' && (
-                        <span className="ml-2 rounded bg-red-100 px-1.5 py-0.5 font-sans text-xs text-red-700">Batal</span>
+                        <span className="ml-2 rounded-md bg-red-50 px-1.5 py-0.5 font-sans text-xs font-medium text-red-700 ring-1 ring-inset ring-red-600/20">
+                          Batal
+                        </span>
                       )}
                     </div>
                     <div className="truncate text-xs text-slate-500">
@@ -91,11 +100,14 @@ export function SalesHistoryPage() {
                       {s.customer_name && ` · ${s.customer_name}`}
                     </div>
                   </div>
-                  <div className="shrink-0 text-right">
-                    <div className={`font-semibold ${s.status === 'void' ? 'text-slate-400 line-through' : ''}`}>
-                      {rupiah(s.total)}
+                  <div className="flex shrink-0 items-center gap-2">
+                    <div className="text-right">
+                      <div className={`font-semibold ${s.status === 'void' ? 'text-slate-400 line-through' : ''}`}>
+                        {rupiah(s.total)}
+                      </div>
+                      <div className="text-xs text-slate-500">{paymentLabel[s.payment_method]}</div>
                     </div>
-                    <div className="text-xs text-slate-500">{paymentLabel[s.payment_method]}</div>
+                    <ChevronRight size={18} className="text-slate-300 transition-transform group-hover:translate-x-0.5 group-hover:text-slate-400" aria-hidden />
                   </div>
                 </Link>
               </li>
@@ -120,15 +132,15 @@ function DailySummary({ date, rows }: { date: string; rows: SaleRow[] }) {
   const voided = rows.length - done.length
 
   return (
-    <Card className="p-4">
-      <div className="mb-3 text-sm text-slate-500">{longDate(date)}</div>
-      <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
+    <Card className="p-5">
+      <div className="mb-4 text-sm font-medium text-slate-600">{longDate(date)}</div>
+      <div className="grid grid-cols-2 gap-4 sm:grid-cols-4">
         <Stat label="Jumlah Penjualan" value={num(done.length)} />
         <Stat label="Omzet" value={rupiah(omzet)} strong />
         <Stat label="Total Diskon" value={rupiah(discount)} />
         <Stat label="Penjualan Batal" value={num(voided)} />
       </div>
-      <div className="mt-3 grid grid-cols-3 gap-3 border-t border-slate-100 pt-3">
+      <div className="mt-4 grid grid-cols-3 gap-4 rounded-lg bg-slate-100/80 p-3">
         {(['cash', 'qris', 'transfer'] as const).map((m) => (
           <Stat key={m} label={paymentLabel[m]} value={rupiah(byMethod[m])} />
         ))}
@@ -141,7 +153,7 @@ function Stat({ label, value, strong }: { label: string; value: string; strong?:
   return (
     <div>
       <div className="text-xs text-slate-500">{label}</div>
-      <div className={strong ? 'text-lg font-bold' : 'font-semibold'}>{value}</div>
+      <div className={`mt-0.5 tracking-tight ${strong ? 'text-2xl font-semibold text-teal-800' : 'text-lg font-semibold'}`}>{value}</div>
     </div>
   )
 }

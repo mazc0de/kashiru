@@ -1,7 +1,7 @@
 import { useQueryClient } from '@tanstack/react-query'
 import { useEffect, useMemo, useState } from 'react'
 import { Link, useSearchParams } from 'react-router'
-import { PackagePlus, Save, Trash2 } from 'lucide-react'
+import { CircleCheck, PackagePlus, Save, ScanBarcode, Trash2 } from 'lucide-react'
 import { ScanSearchInput } from '../components/ScanSearchInput'
 import { Button, Card, ErrorBox, Field, Input, NumberInput, PageHeader, Spinner, WarnBox } from '../components/ui'
 import { errorText } from '../lib/errors'
@@ -94,7 +94,7 @@ export function ReceivingPage() {
       <div className="relative">
         <ScanSearchInput autoFocus value={query} onChange={setQuery} onSubmit={onSubmit} />
         {query.trim() && (
-          <div className="absolute z-20 mt-1 max-h-80 w-full overflow-y-auto rounded-xl border border-slate-200 bg-white shadow-lg">
+          <div className="animate-flash absolute z-20 mt-1.5 max-h-80 w-full overflow-y-auto rounded-xl border border-slate-200 bg-white p-1 shadow-raised">
             {results.length === 0 ? (
               <p className="p-3 text-sm text-slate-500">Tidak ada Sparepart yang cocok.</p>
             ) : (
@@ -103,7 +103,7 @@ export function ReceivingPage() {
                   key={p.id}
                   type="button"
                   onClick={() => add(p)}
-                  className="flex w-full justify-between gap-3 border-b border-slate-100 px-3 py-2 text-left last:border-0 hover:bg-slate-50"
+                  className="flex w-full justify-between gap-3 rounded-lg px-3 py-2.5 text-left transition-colors hover:bg-slate-100"
                 >
                   <span className="min-w-0 truncate">
                     {p.name} <span className="text-xs text-slate-500">{p.part_number}</span>
@@ -119,7 +119,7 @@ export function ReceivingPage() {
       </div>
 
       {unknownBarcode && (
-        <div className="flex flex-wrap items-center justify-between gap-2 rounded-lg border border-amber-200 bg-amber-50 px-3 py-2 text-sm text-amber-900">
+        <div className="animate-flash flex flex-wrap items-center justify-between gap-2 rounded-lg border border-amber-200 bg-amber-50 px-3 py-2 text-sm text-amber-900">
           <span>
             Barcode <b>{unknownBarcode}</b> belum terdaftar.
           </span>
@@ -131,11 +131,19 @@ export function ReceivingPage() {
           </Link>
         </div>
       )}
-      {done && <div className="rounded-lg bg-emerald-50 px-3 py-2 text-sm text-emerald-800">{done}</div>}
+      {done && (
+        <div role="status" className="animate-flash flex gap-2 rounded-lg bg-emerald-50 px-3 py-2.5 text-sm text-emerald-800 ring-1 ring-inset ring-emerald-600/20">
+          <CircleCheck size={18} className="mt-px shrink-0" />
+          {done}
+        </div>
+      )}
 
       <Card>
         {lines.length === 0 ? (
-          <p className="p-6 text-center text-sm text-slate-500">Scan atau cari Sparepart yang datang dari supplier.</p>
+          <div className="flex flex-col items-center gap-2 px-6 py-12 text-center text-sm text-slate-500">
+            <ScanBarcode size={28} className="text-slate-400" aria-hidden />
+            Scan atau cari Sparepart yang datang dari supplier.
+          </div>
         ) : (
           <ul>
             {lines.map((l) => {
@@ -143,7 +151,7 @@ export function ReceivingPage() {
               const set = (patch: Partial<Line>) =>
                 setLines((ls) => ls.map((x) => (x.productId === l.productId ? { ...x, ...patch } : x)))
               return (
-                <li key={l.productId} className="space-y-2 border-b border-slate-100 p-3 last:border-0">
+                <li key={l.productId} className="space-y-3 border-b border-slate-100 p-4 last:border-0">
                   <div className="flex justify-between gap-2">
                     <div className="min-w-0">
                       <div className="font-medium">{p.name}</div>
@@ -184,18 +192,18 @@ export function ReceivingPage() {
       </Card>
 
       {lines.length > 0 && (
-        <Card className="space-y-3 p-3">
+        <Card className="space-y-4 p-4">
           <Field label="Catatan (opsional)">
             <Input value={note} placeholder="Supplier, nomor faktur…" onChange={(e) => setNote(e.target.value)} />
           </Field>
-          <div className="flex justify-between font-semibold">
+          <div className="flex items-baseline justify-between text-lg font-semibold tracking-tight">
             <span>Total pembelian</span>
             <span>{rupiah(total)}</span>
           </div>
           <ErrorBox>{error}</ErrorBox>
           <Button className="w-full" disabled={!valid || busy || !online} onClick={save}>
             <Save size={18} />
-            {busy ? 'Menyimpan…' : !online ? 'Offline — tidak bisa simpan' : 'Simpan Penerimaan'}
+            {busy ? 'Menyimpan…' : !online ? 'Offline: tidak bisa simpan' : 'Simpan Penerimaan'}
           </Button>
         </Card>
       )}

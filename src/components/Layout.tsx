@@ -3,7 +3,7 @@ import { Boxes, History, LogOut, PackageCheck, Settings, ShoppingCart, WifiOff }
 import { useAuth, useMyProfile, useSignOut } from '../lib/auth'
 import { useOnline } from '../lib/online'
 import { useStore } from '../lib/queries'
-import { Button, Spinner } from './ui'
+import { Button, Spinner, focusRing } from './ui'
 
 const nav = [
   { to: '/', label: 'Kasir', icon: ShoppingCart, end: true },
@@ -17,9 +17,9 @@ export function OfflineBanner() {
   const online = useOnline()
   if (online) return null
   return (
-    <div className="flex items-center justify-center gap-2 bg-red-600 px-4 py-2 text-center text-sm font-medium text-white">
+    <div role="status" className="flex items-center justify-center gap-2 bg-red-700 px-4 py-2 text-center text-sm font-medium text-white">
       <WifiOff size={16} className="shrink-0" />
-      Koneksi internet terputus — penyimpanan dinonaktifkan. Pencarian tetap jalan dari data tersimpan.
+      Koneksi internet terputus. Penyimpanan dinonaktifkan, pencarian tetap jalan dari data tersimpan.
     </div>
   )
 }
@@ -45,8 +45,8 @@ export function AppLayout() {
   if (!profile.data) return <Navigate to="/buat-toko" replace />
   if (!profile.data.is_active) {
     return (
-      <div className="mx-auto max-w-sm p-6 text-center">
-        <h1 className="text-lg font-semibold">Akun nonaktif</h1>
+      <div className="mx-auto max-w-sm px-4 py-16 text-center">
+        <h1 className="text-xl font-semibold tracking-tight">Akun nonaktif</h1>
         <p className="mt-2 text-slate-600">Akun ini sudah dinonaktifkan oleh Toko. Hubungi pemilik bengkel.</p>
         <Button className="mt-4" variant="secondary" onClick={signOut}>
           <LogOut size={18} />
@@ -58,38 +58,56 @@ export function AppLayout() {
 
   return (
     <div className="flex min-h-dvh flex-col">
-      <header className="sticky top-0 z-20 border-b border-slate-200 bg-white">
+      <a
+        href="#konten"
+        className="sr-only z-50 rounded-lg bg-white px-3 py-2 text-sm font-medium text-teal-800 shadow-raised focus:not-sr-only focus:fixed focus:top-2 focus:left-2"
+      >
+        Lewati ke konten
+      </a>
+      <header className="sticky top-0 z-20 border-b border-slate-200/80 bg-white/90 backdrop-blur-md supports-[not(backdrop-filter:blur(0))]:bg-white">
         <OfflineBanner />
-        <div className="mx-auto flex max-w-7xl items-center gap-3 px-3 py-2">
-          <div className="min-w-0 shrink-0">
-            <div className="font-bold text-teal-700">Kashiru</div>
-            <div className="max-w-40 truncate text-xs text-slate-500">{store.data?.name}</div>
+        <div className="mx-auto flex h-16 max-w-7xl items-center gap-3 px-3 sm:gap-4 sm:px-4">
+          <div className="flex min-w-0 shrink-0 items-center gap-2.5">
+            <span
+              aria-hidden
+              className="grid size-9 place-items-center rounded-lg bg-teal-700 text-base font-bold text-white shadow-[inset_0_1px_0_rgb(255_255_255/0.15)]"
+            >
+              K
+            </span>
+            <div className="min-w-0">
+              <div className="text-sm leading-tight font-semibold tracking-tight text-slate-900">Kashiru</div>
+              <div className="max-w-28 truncate text-xs leading-tight sm:max-w-36 text-slate-500">{store.data?.name}</div>
+            </div>
           </div>
-          <nav className="flex flex-1 gap-1 overflow-x-auto">
+          <nav aria-label="Menu utama" className="-my-1 flex flex-1 gap-1 overflow-x-auto py-1 [scrollbar-width:none]">
             {nav.map((n) => (
               <NavLink
                 key={n.to}
                 to={n.to}
                 end={n.end}
                 className={({ isActive }) =>
-                  `flex min-h-11 shrink-0 items-center gap-1.5 rounded-lg px-3 text-sm font-medium ${isActive ? 'bg-teal-50 text-teal-800' : 'text-slate-600 hover:bg-slate-100'}`
+                  `flex min-h-10 shrink-0 items-center gap-1.5 rounded-lg px-3 text-sm font-medium transition-colors duration-150 ${focusRing} ${isActive ? 'bg-teal-700/10 text-teal-800' : 'text-slate-600 hover:bg-slate-100 hover:text-slate-900'}`
                 }
               >
-                <n.icon size={18} />
+                <n.icon size={18} aria-hidden />
                 {n.label}
               </NavLink>
             ))}
           </nav>
-          <div className="hidden shrink-0 text-right text-xs text-slate-500 md:block">
-            {profile.data.display_name}
-            <button type="button" className="ml-auto flex items-center gap-1 text-teal-700 hover:underline" onClick={signOut}>
+          <div className="hidden shrink-0 border-l border-slate-200 pl-4 text-right text-xs md:block">
+            <div className="max-w-32 truncate font-medium text-slate-700">{profile.data.display_name}</div>
+            <button
+              type="button"
+              className={`ml-auto flex items-center gap-1 rounded text-slate-500 transition-colors hover:text-teal-800 ${focusRing}`}
+              onClick={signOut}
+            >
               <LogOut size={14} />
               Keluar
             </button>
           </div>
         </div>
       </header>
-      <main className="mx-auto w-full max-w-7xl flex-1 p-3 sm:p-4">
+      <main id="konten" className="mx-auto w-full max-w-7xl flex-1 px-3 pt-4 pb-10 sm:px-4 sm:pt-6">
         <Outlet />
       </main>
     </div>

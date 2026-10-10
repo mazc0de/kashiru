@@ -33,11 +33,12 @@ export function TagInput({
       {value.length > 0 && (
         <div className="mb-2 flex flex-wrap gap-1.5">
           {value.map((v) => (
-            <span key={v} className="inline-flex items-center gap-1 rounded-full bg-slate-100 py-1 pr-1 pl-3 text-sm">
+            <span key={v} className="inline-flex items-center gap-1 rounded-md bg-slate-100 py-1 pr-1 pl-2.5 text-sm text-slate-800 ring-1 ring-inset ring-slate-200">
               {v}
               <button
                 type="button"
-                className="rounded-full px-1.5 text-slate-500 hover:bg-slate-200"
+                aria-label={`Hapus ${v}`}
+                className="rounded px-1 py-0.5 text-slate-500 transition-colors hover:bg-slate-200 hover:text-slate-800"
                 onClick={() => onChange(value.filter((x) => x !== v))}
               >
                 <X size={14} />
@@ -63,14 +64,14 @@ export function TagInput({
         />
         {hits.length > 0 && (
           <div
-            className="absolute z-30 mt-1 w-full rounded-lg border border-slate-200 bg-white shadow-lg"
+            className="animate-flash absolute z-30 mt-1.5 w-full rounded-xl border border-slate-200 bg-white p-1 shadow-raised"
             onMouseDown={(e) => e.preventDefault()}
           >
             {hits.map((h) => (
               <button
                 key={h}
                 type="button"
-                className="block w-full px-3 py-2 text-left hover:bg-slate-50"
+                className="block w-full rounded-lg px-3 py-2 text-left hover:bg-slate-100"
                 onClick={() => add(h)}
               >
                 {h}

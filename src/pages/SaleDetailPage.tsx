@@ -63,16 +63,16 @@ export function SaleDetailPage() {
       />
 
       {s.status === 'void' && (
-        <div className="rounded-lg border border-red-200 bg-red-50 px-3 py-2 text-sm text-red-800">
-          <b>Penjualan Batal</b> — {s.void_reason}
-          <div className="text-xs">
+        <div className="rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-800">
+          <b>Penjualan Batal:</b> {s.void_reason}
+          <div className="mt-1 text-xs text-red-700">
             {s.voided_at && dateTime(s.voided_at)} oleh {s.voider?.display_name ?? '-'}. Stok sudah dikembalikan; tidak
             dihitung sebagai omzet.
           </div>
         </div>
       )}
 
-      <Card className="grid grid-cols-2 gap-3 p-4 text-sm sm:grid-cols-3">
+      <Card className="grid grid-cols-2 gap-4 p-5 text-sm sm:grid-cols-3">
         <Info label="Waktu" value={dateTime(s.created_at)} />
         <Info label="Kasir" value={s.cashier?.display_name ?? '-'} />
         <Info label="Mekanik" value={s.mechanic?.name ?? '-'} />
@@ -84,11 +84,13 @@ export function SaleDetailPage() {
       <Card>
         <ul>
           {items.map((it) => (
-            <li key={it.id} className="flex justify-between gap-3 border-b border-slate-100 px-4 py-2.5 last:border-0">
+            <li key={it.id} className="flex justify-between gap-3 border-b border-slate-100 px-5 py-3 last:border-0">
               <div className="min-w-0 text-sm">
                 <div className="font-medium">
                   {it.kind === 'service' && (
-                    <span className="mr-1 rounded bg-sky-100 px-1.5 py-0.5 text-xs text-sky-800">Jasa</span>
+                    <span className="mr-1.5 rounded-md bg-slate-100 px-1.5 py-0.5 align-middle text-xs font-medium text-slate-600 ring-1 ring-inset ring-slate-200">
+                      Jasa
+                    </span>
                   )}
                   {it.name}
                 </div>
@@ -102,11 +104,11 @@ export function SaleDetailPage() {
             </li>
           ))}
         </ul>
-        <div className="space-y-1 border-t border-slate-200 p-4 text-sm">
+        <div className="space-y-1.5 border-t border-slate-200 bg-slate-50/60 p-5 text-sm">
           <Row label="Subtotal" value={rupiah(s.subtotal)} />
           {s.line_discount_total > 0 && <Row label="Diskon baris" value={`−${rupiah(s.line_discount_total)}`} />}
           {s.discount > 0 && <Row label="Diskon Penjualan" value={`−${rupiah(s.discount)}`} />}
-          <div className="flex justify-between text-lg font-bold">
+          <div className="flex items-baseline justify-between py-1 text-2xl font-semibold tracking-tight">
             <span>Total</span>
             <span>{rupiah(s.total)}</span>
           </div>
@@ -123,7 +125,7 @@ export function SaleDetailPage() {
             voidSale.mutate()
           }}
         >
-          <p className="text-sm text-slate-600">
+          <p className="text-sm leading-relaxed text-slate-600">
             Stok Sparepart dikembalikan dan Penjualan tidak dihitung sebagai omzet. Nomor Nota tetap terpakai. Untuk
             koreksi, buat Penjualan baru setelah ini.
           </p>
@@ -153,7 +155,7 @@ function Info({ label, value }: { label: string; value: string }) {
 
 function Row({ label, value }: { label: string; value: string }) {
   return (
-    <div className="flex justify-between">
+    <div className="flex justify-between gap-3 text-slate-600">
       <span>{label}</span>
       <span>{value}</span>
     </div>

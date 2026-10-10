@@ -32,6 +32,8 @@ export default defineConfig({
       },
       workbox: {
         navigateFallback: '/index.html',
+        // Default + font Geist subset Latin agar tampilan tetap sama saat offline.
+        globPatterns: ['**/*.{js,wasm,css,html}', 'assets/geist-*latin*-wght-normal-*.woff2'],
         // Data Supabase tidak di-cache oleh service worker; cache data ada di TanStack Query.
         runtimeCaching: [],
       },

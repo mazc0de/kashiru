@@ -130,7 +130,7 @@ function ProductForm({ existing }: { existing?: CatalogEntry }) {
     <form onSubmit={submit} className="mx-auto max-w-2xl space-y-4">
       <PageHeader title={isNew ? 'Sparepart baru' : `Ubah ${existing.name}`} />
 
-      <Card className="space-y-3 p-4">
+      <Card className="space-y-4 p-5">
         <Field label="Nama Sparepart">
           <Input required autoFocus={isNew} value={name} onChange={(e) => setName(e.target.value)} />
         </Field>
@@ -166,7 +166,7 @@ function ProductForm({ existing }: { existing?: CatalogEntry }) {
         </Field>
       </Card>
 
-      <Card className="space-y-3 p-4">
+      <Card className="space-y-4 p-5">
         <div className="grid gap-3 sm:grid-cols-3">
           <Field label="Satuan">
             <CreatableSelect
@@ -190,15 +190,15 @@ function ProductForm({ existing }: { existing?: CatalogEntry }) {
         )}
         {!isNew && (
           <p className="text-xs text-slate-500">
-            Harga Beli Terakhir {rupiah(existing.last_cost)} · HPP {rupiah(existing.hpp)} — berubah lewat Penerimaan Barang.
+            Harga Beli Terakhir {rupiah(existing.last_cost)}, HPP {rupiah(existing.hpp)}. Berubah lewat Penerimaan Barang.
             Stok tidak bisa diubah di sini.
           </p>
         )}
       </Card>
 
       {isNew && (
-        <Card className="space-y-3 p-4">
-          <h2 className="font-semibold">Stok Awal</h2>
+        <Card className="space-y-4 p-5">
+          <h2 className="font-semibold tracking-tight">Stok Awal</h2>
           <p className="text-sm text-slate-500">
             Jumlah yang sudah ada di bengkel saat ini. Hanya diisi sekali; setelahnya Stok berubah lewat Penerimaan Barang
             dan Penjualan.
@@ -214,16 +214,17 @@ function ProductForm({ existing }: { existing?: CatalogEntry }) {
         </Card>
       )}
 
-      <Card className="space-y-3 p-4">
-        <h2 className="font-semibold">Barcode</h2>
+      <Card className="space-y-4 p-5">
+        <h2 className="font-semibold tracking-tight">Barcode</h2>
         {barcodes.length > 0 && (
           <ul className="flex flex-wrap gap-2">
             {barcodes.map((b) => (
-              <li key={b} className="inline-flex items-center gap-1 rounded-full bg-slate-100 py-1 pr-1 pl-3 font-mono text-sm">
+              <li key={b} className="inline-flex items-center gap-1 rounded-md bg-slate-100 py-1 pr-1 pl-2.5 font-mono text-sm text-slate-800 ring-1 ring-inset ring-slate-200">
                 {b}
                 <button
                   type="button"
-                  className="rounded-full px-1.5 text-slate-500 hover:bg-slate-200"
+                  aria-label={`Hapus Barcode ${b}`}
+                  className="rounded px-1 py-0.5 text-slate-500 transition-colors hover:bg-slate-200 hover:text-slate-800"
                   onClick={() => setBarcodes((x) => x.filter((y) => y !== b))}
                 >
                   <X size={14} />
@@ -252,9 +253,9 @@ function ProductForm({ existing }: { existing?: CatalogEntry }) {
       </Card>
 
       {!isNew && (
-        <Card className="p-4">
+        <Card className="p-5">
           <label className="flex items-center gap-3">
-            <input type="checkbox" className="size-5" checked={isActive} onChange={(e) => setIsActive(e.target.checked)} />
+            <input type="checkbox" className="size-5 accent-teal-700" checked={isActive} onChange={(e) => setIsActive(e.target.checked)} />
             <span>
               <span className="font-medium">Aktif</span>
               <span className="block text-sm text-slate-500">

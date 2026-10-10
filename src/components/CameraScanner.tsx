@@ -10,7 +10,7 @@ import {
   type LuminanceSource,
 } from '@zxing/library'
 import { useEffect, useRef, useState } from 'react'
-import { Modal } from './ui'
+import { ErrorBox, Modal } from './ui'
 
 // Format di kemasan sparepart: EAN/UPC (barang retail), Code 128/39/ITF, PDF417 (label Honda AHM), QR/Data Matrix.
 const ZXING_FORMATS = [
@@ -126,7 +126,7 @@ export function CameraScanner({
     // Elemen <video> baru per percobaan: di StrictMode efek jalan dua kali, dan pembersihan
     // percobaan pertama yang telat tidak boleh mengosongkan video percobaan kedua (layar hitam).
     const video = document.createElement('video')
-    video.className = 'aspect-[4/3] w-full rounded-lg bg-black object-cover'
+    video.className = 'aspect-[4/3] w-full rounded-lg bg-slate-950 object-cover'
     video.muted = true
     video.autoplay = true
     video.playsInline = true
@@ -217,11 +217,11 @@ export function CameraScanner({
 
   return (
     <Modal open={open} onClose={onClose} title="Scan Barcode">
-      {message && <p className="text-sm text-red-700">{message}</p>}
+      {message && <ErrorBox>{message}</ErrorBox>}
       <div ref={boxRef} className={message ? 'hidden' : 'relative'} />
       {!message && (
         <p className="mt-2 text-center text-sm text-slate-500">
-          {last ? `Terbaca: ${last}` : 'Arahkan kamera ke Barcode, jaga jarak ±15–25 cm agar fokus'}
+          {last ? `Terbaca: ${last}` : 'Arahkan kamera ke Barcode, jaga jarak ±15-25 cm agar fokus'}
         </p>
       )}
     </Modal>

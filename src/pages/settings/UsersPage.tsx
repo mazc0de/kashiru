@@ -29,8 +29,8 @@ export function UsersPage() {
             <UserPlus size={18} />
             Pengguna
           </Button>} />
-      <p className="text-sm text-slate-500">
-        Semua Pengguna punya akses penuh yang sama. Pengguna yang keluar dinonaktifkan — tidak bisa login, tetapi tetap
+      <p className="max-w-[65ch] text-sm leading-relaxed text-slate-500">
+        Semua Pengguna punya akses penuh yang sama. Pengguna yang keluar dinonaktifkan: tidak bisa login, tetapi tetap
         tercatat di riwayat.
       </p>
       <ErrorBox>{error}</ErrorBox>
@@ -46,7 +46,11 @@ export function UsersPage() {
                   <div className="min-w-0">
                     <div className="font-medium">
                       {p.display_name} {me && <span className="text-xs text-slate-500">(Anda)</span>}
-                      {!p.is_active && <span className="ml-2 rounded bg-slate-200 px-1.5 py-0.5 text-xs">Nonaktif</span>}
+                      {!p.is_active && (
+                        <span className="ml-2 rounded-md bg-slate-100 px-1.5 py-0.5 text-xs font-medium text-slate-600 ring-1 ring-inset ring-slate-200">
+                          Nonaktif
+                        </span>
+                      )}
                     </div>
                     <div className="truncate text-xs text-slate-500">{p.email}</div>
                   </div>

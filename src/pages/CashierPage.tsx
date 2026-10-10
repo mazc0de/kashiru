@@ -1,6 +1,6 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { useEffect, useMemo, useRef, useState } from 'react'
-import { Check, Minus, Plus, Printer, Save, Trash2, Wrench, X } from 'lucide-react'
+import { Check, CircleCheck, Minus, PackageSearch, Plus, Printer, Save, Trash2, Wrench, X } from 'lucide-react'
 import { PrintReceipt } from '../components/Receipt'
 import { ScanSearchInput } from '../components/ScanSearchInput'
 import { Select } from '../components/Select'
@@ -17,6 +17,7 @@ import {
   StockBadge,
   Switch,
   WarnBox,
+  focusRing,
 } from '../components/ui'
 import { useMyProfile } from '../lib/auth'
 import { computeTotals, emptyCart, usePersistentCart, type Cart, type CartLine } from '../lib/cart'
@@ -202,7 +203,8 @@ function Cashier({ storeId }: { storeId: string }) {
                   setCategoryId((id) => (id === c.id ? null : c.id))
                   setLimit(PAGE)
                 }}
-                className={`min-h-10 shrink-0 rounded-full border px-3 text-sm ${categoryId === c.id ? 'border-teal-700 bg-teal-700 text-white' : 'border-slate-300 bg-white text-slate-700'}`}
+                aria-pressed={categoryId === c.id}
+                className={`min-h-10 shrink-0 rounded-lg px-3 text-sm font-medium transition-[background-color,color,box-shadow] duration-150 active:scale-[0.98] ${focusRing} ${categoryId === c.id ? 'bg-teal-700 text-white shadow-[inset_0_1px_0_rgb(255_255_255/0.12)]' : 'bg-white text-slate-700 ring-1 ring-inset ring-slate-300 hover:ring-slate-400'}`}
               >
                 {c.name}
               </button>
@@ -212,19 +214,24 @@ function Cashier({ storeId }: { storeId: string }) {
 
         {flash && (
           <div
-            className={`rounded-lg px-3 py-2 text-sm font-medium ${flash.kind === 'ok' ? 'bg-emerald-50 text-emerald-800' : 'bg-red-50 text-red-700'}`}
+            role="status"
+            key={flash.text}
+            className={`animate-flash flex items-center gap-2 rounded-lg px-3 py-2 text-sm font-medium ring-1 ring-inset ${flash.kind === 'ok' ? 'bg-emerald-50 text-emerald-800 ring-emerald-600/20' : 'bg-red-50 text-red-800 ring-red-600/20'}`}
           >
+            {flash.kind === 'ok' && <CircleCheck size={16} className="shrink-0" />}
             {flash.text}
           </div>
         )}
 
-        <div className="max-h-[55vh] overflow-y-auto lg:max-h-[calc(100dvh-13rem)]">
+        {/* -m-3 p-3: ruang di dalam area scroll agar badge jumlah (-top-2 -right-2) dan bayangan kartu tidak terpotong. */}
+        <div className="-m-3 max-h-[55vh] overflow-y-auto p-3 lg:max-h-[calc(100dvh-13rem)]">
           {products.length === 0 ? (
-            <p className="rounded-xl border border-slate-200 bg-white p-6 text-center text-sm text-slate-500">
+            <div className="flex flex-col items-center gap-2 rounded-xl border border-dashed border-slate-300 bg-white/60 px-6 py-10 text-center text-sm text-slate-500">
+              <PackageSearch size={28} className="text-slate-400" aria-hidden />
               {catalog.entries.length === 0 ? 'Belum ada Sparepart.' : 'Tidak ada Sparepart yang cocok.'}
-            </p>
+            </div>
           ) : (
-            <div className="grid grid-cols-2 gap-2 sm:grid-cols-3 xl:grid-cols-4">
+            <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 sm:gap-4 xl:grid-cols-4">
               {products.slice(0, limit).map((p) => {
                 const inCart = qtyInCart(p.id)
                 return (
@@ -232,21 +239,21 @@ function Cashier({ storeId }: { storeId: string }) {
                     key={p.id}
                     type="button"
                     onClick={() => addProduct(p)}
-                    className={`relative flex min-h-28 flex-col justify-between gap-1 rounded-xl border bg-white p-3 text-left transition-colors active:bg-teal-50 ${inCart ? 'border-teal-600 ring-1 ring-teal-600' : 'border-slate-200 hover:border-teal-600'}`}
+                    className={`relative flex min-h-28 flex-col justify-between gap-2 rounded-xl border bg-white p-3 text-left shadow-panel transition-[border-color,box-shadow,transform] duration-150 hover:shadow-raised active:scale-[0.98] ${focusRing} ${inCart ? 'border-teal-600 ring-1 ring-teal-600' : 'border-slate-200/80 hover:border-slate-300'}`}
                   >
                     {inCart > 0 && (
-                      <span className="absolute -top-2 -right-2 flex min-w-6 items-center justify-center rounded-full bg-teal-700 px-1.5 text-xs font-semibold text-white">
+                      <span className="absolute -top-2 -right-2 flex h-6 min-w-6 items-center justify-center rounded-md bg-teal-700 px-1.5 text-xs font-semibold text-white shadow-[0_2px_6px_rgb(15_118_110/0.35)]">
                         {num(inCart)}
                       </span>
                     )}
                     <div className="min-w-0">
-                      <div className="line-clamp-2 text-sm font-medium">{p.name}</div>
-                      <div className="truncate text-xs text-slate-500">
+                      <div className="line-clamp-2 text-sm leading-snug font-medium text-slate-900">{p.name}</div>
+                      <div className="mt-0.5 truncate text-xs text-slate-500">
                         {[p.part_number, p.brandName].filter(Boolean).join(' · ')}
                       </div>
                     </div>
                     <div>
-                      <div className="font-semibold text-teal-800">{rupiah(p.sell_price)}</div>
+                      <div className="font-semibold tracking-tight text-slate-900">{rupiah(p.sell_price)}</div>
                       <div className="flex items-center justify-between gap-1 text-xs text-slate-500">
                         <span className="truncate">
                           Stok {num(p.stock)} {p.unit}
@@ -270,9 +277,14 @@ function Cashier({ storeId }: { storeId: string }) {
       </div>
 
       {/* Kanan: keranjang, ringkasan & bayar */}
-      <Card className="h-fit space-y-3 p-3 lg:sticky lg:top-20">
-        <div className="flex items-center justify-between">
-          <h2 className="font-semibold">Keranjang</h2>
+      <Card className="h-fit space-y-4 p-4 lg:sticky lg:top-24">
+        <div className="flex items-center justify-between gap-2">
+          <h2 className="text-lg font-semibold tracking-tight">
+            Keranjang
+            {cart.lines.length > 0 && (
+              <span className="ml-2 align-middle text-sm font-normal text-slate-500">{num(cart.lines.length)} baris</span>
+            )}
+          </h2>
           <div className="flex gap-2">
             <Button variant="secondary" onClick={() => setServiceOpen(true)}>
               <Wrench size={18} />
@@ -294,11 +306,11 @@ function Cashier({ storeId }: { storeId: string }) {
           </div>
         </div>
         {cart.lines.length === 0 ? (
-          <p className="rounded-lg bg-slate-50 p-4 text-center text-sm text-slate-500">
+          <p className="rounded-lg border border-dashed border-slate-300 px-4 py-6 text-center text-sm text-slate-500">
             Sentuh Sparepart di daftar atau scan Barcode untuk memulai.
           </p>
         ) : (
-          <ul className="-mx-3 border-y border-slate-100">
+          <ul className="-mx-4 border-y border-slate-100">
             {cart.lines.map((l) => (
               <CartRow
                 key={l.key}
@@ -337,7 +349,7 @@ function Cashier({ storeId }: { storeId: string }) {
           />
         </Field>
 
-        <div className="space-y-1 border-t border-slate-100 pt-3 text-sm">
+        <div className="space-y-1.5 border-t border-slate-100 pt-4 text-sm">
           <Row label="Subtotal" value={rupiah(totals.subtotal)} />
           {totals.lineDiscount > 0 && <Row label="Diskon baris" value={`−${rupiah(totals.lineDiscount)}`} />}
           <div className="flex flex-wrap items-center justify-between gap-2">
@@ -365,7 +377,7 @@ function Cashier({ storeId }: { storeId: string }) {
             )}
           </div>
           {totals.saleDiscount > 0 && <Row label="" value={`−${rupiah(totals.saleDiscount)}`} />}
-          <div className="flex items-center justify-between pt-2 text-2xl font-bold">
+          <div className="flex items-baseline justify-between pt-2 text-3xl font-semibold tracking-tight">
             <span>Total</span>
             <span>{rupiah(totals.total)}</span>
           </div>
@@ -400,7 +412,7 @@ function Cashier({ storeId }: { storeId: string }) {
             />
           </div>
         ) : (
-          <p className="rounded-lg bg-slate-50 p-2 text-sm text-slate-600">
+          <p className="rounded-lg bg-slate-100 px-3 py-2.5 text-sm text-slate-700">
             {cart.method === 'qris'
               ? 'Pastikan pembayaran QRIS sudah masuk sebelum menyimpan.'
               : 'Pastikan transfer sudah diterima sebelum menyimpan.'}
@@ -410,13 +422,13 @@ function Cashier({ storeId }: { storeId: string }) {
         {save.error && (
           <ErrorBox>
             {isNetworkError(save.error)
-              ? 'Koneksi terputus saat menyimpan. Keranjang tetap aman — tekan Simpan lagi setelah koneksi pulih (tidak akan tercatat dua kali).'
+              ? 'Koneksi terputus saat menyimpan. Keranjang tetap aman: tekan Simpan lagi setelah koneksi pulih (tidak akan tercatat dua kali).'
               : errorText(save.error)}
           </ErrorBox>
         )}
-        <Button className="w-full text-lg" disabled={!canSave} onClick={() => save.mutate()}>
+        <Button className="min-h-13 w-full text-lg" disabled={!canSave} onClick={() => save.mutate()}>
           <Save size={20} />
-          {save.isPending ? 'Menyimpan…' : !online ? 'Offline — tidak bisa simpan' : 'Simpan & Cetak'}
+          {save.isPending ? 'Menyimpan…' : !online ? 'Offline: tidak bisa simpan' : 'Simpan & Cetak'}
         </Button>
       </Card>
 
@@ -437,15 +449,18 @@ function Cashier({ storeId }: { storeId: string }) {
       <Modal open={!!saved} onClose={() => setSaved(null)} title="Penjualan tersimpan">
         {saved && (
           <div className="space-y-3">
-            <p>
-              Nomor Nota <b>{saved.receipt_no}</b> — total <b>{rupiah(saved.total)}</b>
+            <dl className="grid grid-cols-2 gap-x-3 gap-y-2 rounded-lg bg-slate-100 p-3 text-sm">
+              <dt className="text-slate-500">Nomor Nota</dt>
+              <dd className="text-right font-mono font-medium">{saved.receipt_no}</dd>
+              <dt className="text-slate-500">Total</dt>
+              <dd className="text-right font-semibold">{rupiah(saved.total)}</dd>
               {saved.payment_method === 'cash' && (
                 <>
-                  , kembalian <b>{rupiah(saved.change)}</b>
+                  <dt className="text-slate-500">Kembalian</dt>
+                  <dd className="text-right text-lg font-semibold tracking-tight text-teal-800">{rupiah(saved.change)}</dd>
                 </>
               )}
-              .
-            </p>
+            </dl>
             <div className="flex gap-2">
               <Button variant="secondary" className="flex-1" onClick={() => setPrintKey((k) => k + 1)}>
                 <Printer size={18} />
@@ -472,7 +487,7 @@ function Cashier({ storeId }: { storeId: string }) {
 
 function Row({ label, value, strong }: { label: string; value: string; strong?: boolean }) {
   return (
-    <div className={`flex justify-between ${strong ? 'text-base font-semibold' : ''}`}>
+    <div className={`flex justify-between gap-3 ${strong ? 'text-base font-semibold' : 'text-slate-600'}`}>
       <span>{label}</span>
       <span>{value}</span>
     </div>
@@ -499,12 +514,14 @@ function CartRow({
   const afterSale = product ? product.stock - totalQtyOfProduct : 0
   const [discOn, setDiscOn] = useState(line.discValue > 0)
   return (
-    <li className="space-y-2 border-b border-slate-100 p-3 last:border-0">
+    <li className="space-y-2 border-b border-slate-100 px-4 py-3 last:border-0">
       <div className="flex items-start justify-between gap-2">
         <div className="min-w-0">
           <div className="font-medium">
             {line.kind === 'service' && (
-              <span className="mr-1 rounded bg-sky-100 px-1.5 py-0.5 text-xs text-sky-800">Jasa</span>
+              <span className="mr-1.5 rounded-md bg-slate-100 px-1.5 py-0.5 align-middle text-xs font-medium text-slate-600 ring-1 ring-inset ring-slate-200">
+                Jasa
+              </span>
             )}
             {name}
           </div>
@@ -558,7 +575,7 @@ function CartRow({
       )}
       {line.kind === 'part' && product && afterSale < 0 && (
         <WarnBox>
-          Stok sistem {num(product.stock)} {product.unit} — setelah Penjualan ini Stok jadi {num(afterSale)}. Tetap bisa
+          Stok sistem {num(product.stock)} {product.unit}, setelah Penjualan ini Stok jadi {num(afterSale)}. Tetap bisa
           disimpan; cek Penerimaan Barang yang belum diinput.
         </WarnBox>
       )}

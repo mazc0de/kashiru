@@ -38,21 +38,21 @@ export function ProductDetailPage() {
         }
       />
       {!p.is_active && (
-        <p className="rounded-lg bg-slate-100 px-3 py-2 text-sm text-slate-600">
-          Sparepart ini nonaktif — tidak muncul di kasir dan pencarian.
+        <p className="rounded-lg bg-slate-200/60 px-3 py-2.5 text-sm text-slate-700">
+          Sparepart ini nonaktif. Tidak muncul di kasir dan pencarian.
         </p>
       )}
       <div className="grid gap-4 md:grid-cols-[320px_1fr]">
-        <Card className="space-y-3 p-4">
-          <div>
+        <Card className="h-fit space-y-4 p-5">
+          <div className="border-b border-slate-100 pb-4">
             <div className="text-sm text-slate-500">Stok</div>
-            <div className="flex items-center gap-2 text-3xl font-bold">
+            <div className="flex items-center gap-2 text-4xl font-semibold tracking-tight">
               {num(p.stock)} <span className="text-base font-normal text-slate-500">{p.unit}</span>
               <StockBadge status={stockStatus(p)} />
             </div>
             <div className="text-xs text-slate-500">Stok minimum {num(p.min_stock)}</div>
           </div>
-          <dl className="grid grid-cols-2 gap-x-3 gap-y-2 text-sm">
+          <dl className="grid grid-cols-2 gap-x-3 gap-y-3 text-sm">
             <Info label="Harga Jual" value={rupiah(p.sell_price)} />
             <Info label="Harga Beli Terakhir" value={rupiah(p.last_cost)} />
             <Info label="HPP" value={rupiah(p.hpp)} />
@@ -114,7 +114,7 @@ function StockCard({ productId, unit }: { productId: string; unit: string }) {
 
   return (
     <Card>
-      <h2 className="border-b border-slate-100 px-4 py-3 font-semibold">Kartu Stok</h2>
+      <h2 className="border-b border-slate-100 px-4 py-3.5 font-semibold tracking-tight">Kartu Stok</h2>
       {q.isLoading ? (
         <Spinner />
       ) : q.error ? (
@@ -125,12 +125,12 @@ function StockCard({ productId, unit }: { productId: string; unit: string }) {
             {q.data!.rows.map((m) => {
               const receipt = m.ref_id ? q.data!.receipts.get(m.ref_id) : undefined
               return (
-                <li key={m.id} className="flex items-start justify-between gap-3 border-b border-slate-100 px-4 py-2.5 last:border-0">
+                <li key={m.id} className="flex items-start justify-between gap-3 border-b border-slate-100 px-4 py-3 last:border-0">
                   <div className="min-w-0 text-sm">
                     <div className="font-medium">
                       {movementLabel[m.type]}
                       {receipt && (
-                        <Link to={`/riwayat/${m.ref_id}`} className="ml-2 font-mono text-xs text-teal-700 hover:underline">
+                        <Link to={`/riwayat/${m.ref_id}`} className="ml-2 font-mono text-xs text-teal-700 underline-offset-2 hover:underline">
                           {receipt}
                         </Link>
                       )}
