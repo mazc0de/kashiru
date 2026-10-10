@@ -3,12 +3,17 @@ import { FunctionsHttpError } from '@supabase/supabase-js'
 /** Pesan error yang bisa ditampilkan ke Pengguna. */
 export async function errorMessage(e: unknown): Promise<string> {
   if (e instanceof FunctionsHttpError) {
+    const res = e.context as Response
+    if (res.status === 404) return 'Edge Function belum di-deploy. Lihat supabase/README.md langkah 3.'
     try {
-      const body = await e.context.json()
+      const body = await res.json()
+      // `error`: pesan dari fungsi kita; `message`: pesan dari gateway/library Supabase.
       if (body?.error) return String(body.error)
+      if (body?.message) return `Edge Function gagal (${res.status}): ${body.message}`
     } catch {
       /* abaikan */
     }
+    return `Edge Function gagal (${res.status}).`
   }
   return errorText(e)
 }
