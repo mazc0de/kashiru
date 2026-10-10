@@ -186,7 +186,7 @@ export function CreateStorePage() {
         <Field label="Nama Toko">
           <Input required value={name} placeholder="Bengkel Maju Jaya" onChange={(e) => setName(e.target.value)} />
         </Field>
-        <Field label="Kode Toko" hint="2–4 huruf, dipakai di awal Nomor Nota (mis. BMJ-261009-0001). Tidak bisa diubah.">
+        <Field label="Kode Toko" hint="2–4 huruf, dipakai di awal Nomor Nota (mis. BMJ-261009-0001). Bisa diubah nanti di Pengaturan.">
           <Input
             required
             value={code}

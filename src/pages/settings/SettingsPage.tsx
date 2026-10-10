@@ -48,6 +48,7 @@ function StoreForm({ store }: { store: Store }) {
   const [name, setName] = useState(store.name)
   const [address, setAddress] = useState(store.address)
   const [phone, setPhone] = useState(store.phone)
+  const [code, setCode] = useState(store.code)
   const [paper, setPaper] = useState<PaperWidth>(store.paper_width)
   const [footer, setFooter] = useState(store.receipt_footer)
   const [msg, setMsg] = useState('')
@@ -56,12 +57,20 @@ function StoreForm({ store }: { store: Store }) {
 
   async function submit(e: FormEvent) {
     e.preventDefault()
+    if (code.length < 2) return setError('Kode Toko harus 2–4 huruf.')
     setBusy(true)
     setError('')
     setMsg('')
     const { error } = await supabase
       .from('stores')
-      .update({ name: name.trim(), address: address.trim(), phone: phone.trim(), paper_width: paper, receipt_footer: footer.trim() })
+      .update({
+        name: name.trim(),
+        code,
+        address: address.trim(),
+        phone: phone.trim(),
+        paper_width: paper,
+        receipt_footer: footer.trim(),
+      })
       .eq('id', store.id)
     setBusy(false)
     if (error) return setError(errorText(error))
@@ -82,8 +91,16 @@ function StoreForm({ store }: { store: Store }) {
         <Field label="Telepon / WA">
           <Input value={phone} onChange={(e) => setPhone(e.target.value)} />
         </Field>
-        <Field label="Kode Toko" hint="Dipakai di Nomor Nota; tidak bisa diubah.">
-          <Input value={store.code} disabled />
+        <Field
+          label="Kode Toko"
+          hint="2–4 huruf, awalan Nomor Nota. Perubahan hanya berlaku untuk Nota baru; Nota lama tetap memakai kode lama."
+        >
+          <Input
+            required
+            value={code}
+            maxLength={4}
+            onChange={(e) => setCode(e.target.value.toUpperCase().replace(/[^A-Z]/g, ''))}
+          />
         </Field>
         <div>
           <span className="mb-1 block text-sm font-medium text-slate-700">Ukuran kertas Nota</span>
