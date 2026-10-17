@@ -78,8 +78,13 @@ h2 {
 }
 
 .receipt {
-  padding: 2mm 0;
-  margin: 0 auto;
+  /* Tanpa padding atas: printer sudah menyisakan kertas kosong di atas
+     (jarak print head ke pisau/tear bar). */
+  padding: 0 0 2mm;
+  /* Rata kiri, jangan di-center: driver thermal memetakan x=0 halaman ke titik
+     pertama print head (yang sudah berada di tengah kertas). Kalau di-center,
+     isi bergeser (kertas − area cetak) / 2 ke kanan dan sisi kanannya terpotong. */
+  margin: 0;
   color: #000;
   font-family: 'Courier New', ui-monospace, monospace;
   font-size: 11px;
