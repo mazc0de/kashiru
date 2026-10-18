@@ -21,6 +21,22 @@ import { SettingsPage } from './pages/settings/SettingsPage'
 import { UsersPage } from './pages/settings/UsersPage'
 import { StockPage } from './pages/StockPage'
 
+// Setelah deploy baru, hash chunk berubah dan service worker baru menghapus precache lama,
+// sehingga tab yang masih memakai bundle lama gagal memuat chunk lazy (mis. CameraScanner).
+// Muat ulang agar memakai bundle terbaru; jeda minimal 10 detik antar-reload mencegah loop.
+const RELOAD_KEY = 'kashiru:chunk-reload-at'
+window.addEventListener('vite:preloadError', (event) => {
+  try {
+    const last = Number(sessionStorage.getItem(RELOAD_KEY) ?? 0)
+    if (Date.now() - last < 10_000) return
+    sessionStorage.setItem(RELOAD_KEY, String(Date.now()))
+  } catch {
+    return
+  }
+  event.preventDefault()
+  window.location.reload()
+})
+
 const router = createBrowserRouter([
   { path: '/login', element: <LoginPage /> },
   { path: '/daftar', element: <SignupPage /> },
