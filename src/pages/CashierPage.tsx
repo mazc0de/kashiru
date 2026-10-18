@@ -2,7 +2,7 @@ import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { useEffect, useMemo, useRef, useState } from 'react'
 import { Check, CircleCheck, Minus, PackageSearch, Plus, Printer, Save, Trash2, Wrench, X } from 'lucide-react'
 import { PrintReceipt } from '../components/Receipt'
-import { ScanSearchInput } from '../components/ScanSearchInput'
+import { ScanSearchInput, type ScanSource } from '../components/ScanSearchInput'
 import { Select } from '../components/Select'
 import {
   Button,
@@ -110,14 +110,14 @@ function Cashier({ storeId }: { storeId: string }) {
     setFlash({ kind: 'ok', text: `+1 ${p.name}` })
   }
 
-  function onSubmitSearch(value: string, source: 'keyboard' | 'camera') {
+  function onSubmitSearch(value: string, source: ScanSource) {
     const byBarcode = catalog.findByCode(value)
     if (byBarcode) {
       addProduct(byBarcode)
       setQuery('')
       return
     }
-    if (source === 'camera' || (looksLikeBarcode(value) && products.length === 0)) {
+    if (source !== 'keyboard' || (looksLikeBarcode(value) && products.length === 0)) {
       setFlash({ kind: 'error', text: `Barcode ${value} tidak dikenal. Tidak ada yang ditambahkan.` })
       setQuery('')
       return

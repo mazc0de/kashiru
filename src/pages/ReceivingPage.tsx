@@ -2,7 +2,7 @@ import { useQueryClient } from '@tanstack/react-query'
 import { useEffect, useMemo, useState } from 'react'
 import { Link, useSearchParams } from 'react-router'
 import { CircleCheck, PackagePlus, Save, ScanBarcode, Trash2 } from 'lucide-react'
-import { ScanSearchInput } from '../components/ScanSearchInput'
+import { ScanSearchInput, type ScanSource } from '../components/ScanSearchInput'
 import { Button, Card, ErrorBox, Field, Input, NumberInput, PageHeader, Spinner, WarnBox } from '../components/ui'
 import { errorText } from '../lib/errors'
 import { num, rupiah } from '../lib/format'
@@ -55,10 +55,10 @@ export function ReceivingPage() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [preset, catalog.isLoading])
 
-  function onSubmit(value: string, source: 'keyboard' | 'camera') {
+  function onSubmit(value: string, source: ScanSource) {
     const hit = catalog.findByCode(value)
     if (hit) return add(hit)
-    if (source === 'camera' || (looksLikeBarcode(value) && results.length === 0)) {
+    if (source !== 'keyboard' || (looksLikeBarcode(value) && results.length === 0)) {
       setUnknownBarcode(value)
       setQuery('')
     } else if (results[0]) {

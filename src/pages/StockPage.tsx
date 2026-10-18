@@ -1,7 +1,7 @@
 import { useMemo, useState } from 'react'
 import { Link, useNavigate } from 'react-router'
 import { ChevronRight, PackagePlus, PackageSearch, Plus } from 'lucide-react'
-import { ScanSearchInput } from '../components/ScanSearchInput'
+import { ScanSearchInput, type ScanSource } from '../components/ScanSearchInput'
 import { Select } from '../components/Select'
 import { Button, Card, PageHeader, Spinner, StockBadge, focusRing } from '../components/ui'
 import { num, rupiah, stockStatus, type StockStatus } from '../lib/format'
@@ -40,11 +40,11 @@ export function StockPage() {
   }, [searched])
   const rows = status ? searched.filter((e) => stockStatus(e) === status) : searched
 
-  function onSubmit(value: string, source: 'keyboard' | 'camera') {
+  function onSubmit(value: string, source: ScanSource) {
     setUnknownBarcode('')
     const hit = catalog.findByCode(value)
     if (hit) return navigate(`/stok/${hit.id}`)
-    if (source === 'camera' || looksLikeBarcode(value)) {
+    if (source !== 'keyboard' || looksLikeBarcode(value)) {
       setUnknownBarcode(value)
       setQuery('')
     } else if (rows.length === 1) {
